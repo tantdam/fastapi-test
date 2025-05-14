@@ -6,9 +6,11 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.testclient import TestClient
 
+from api.auth import require_admin
 from db import Base, get_db
 
 from api import player, auth, national, club
+from models.user import User, RoleEnum
 
 testing_db_url = "sqlite:///:memory:"
 engine = create_engine(
@@ -65,3 +67,27 @@ def client(app: FastAPI, db_session: SessionTesting) -> Generator[TestClient, No
     app.dependency_overrides[get_db] = _get_test_db
     with TestClient(app) as test_client:
         yield test_client
+
+@pytest.fixture
+def db():
+    db = SessionTesting()
+    yield db
+    db.close()
+
+@pytest.fixture
+def admin_user(db):
+    user = User(username="mockadmin", role=RoleEnum.admin)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+@pytest.fixture(scope="function")
+def override_admin(app: FastAPI, admin_user):
+    def _override():
+        try:
+            yield admin_user
+        finally:
+            pass
+    app.dependency_overrides[require_admin] = _override
+    yield
