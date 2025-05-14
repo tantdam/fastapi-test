@@ -3,16 +3,15 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from models.club import Club
-from schemas import ClubCreate, ClubUpdate
+from schemas import ClubCreate, ClubUpdate, ClubRead
 
 
-def create_club(db: Session, club: ClubCreate) -> Club:
-    print(club)
+def create_club(db: Session, club: ClubCreate) -> ClubRead:
     db_club = Club(**club.model_dump())
     db.add(db_club)
     db.commit()
     db.refresh(db_club)
-    return db_club
+    return ClubRead.model_validate(db_club)
 
 def read_club(db: Session, club_id: int) -> Optional[Club]:
     return db.query(Club).filter(Club.id == club_id).first()

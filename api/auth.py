@@ -6,7 +6,7 @@ import crud.user
 from db import get_db
 from schemas.user import UserCreate, UserRead, Token
 from crud import user as crud_user
-from models.user import User
+from models.user import User, RoleEnum
 from core.security import create_access_token, verify_password
 
 from starlette import status
@@ -38,7 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 def require_admin(user: User = Depends(get_current_user)) -> User:
-    if user.role != "admin":
+    if user.role != RoleEnum.admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 

@@ -19,7 +19,7 @@ def _read_club(club_id: int, db: Session = Depends(get_db), user: User = Depends
     return db_club
 
 @router.post('/', response_model=ClubRead)
-def _create_club(club: ClubCreate, db: Session = Depends(get_db), user: User = Depends(require_admin)) -> Club:
+def _create_club(club: ClubCreate, db: Session = Depends(get_db), user: User = Depends(require_admin)) -> ClubRead:
     return create_club(db, club)
 
 @router.put('/{club_id}', response_model=ClubRead)
