@@ -5,3 +5,4 @@ python-jose==3.4.0
 SQLAlchemy==2.0.40
 starlette~=0.46.2
 pytest==8.3.5
+pymongo==4.13.0

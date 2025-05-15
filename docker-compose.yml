@@ -14,5 +14,15 @@ services:
     ports:
       - "5432:5432"
 
+  mongo:
+    image: mongo:latest
+    container_name: local_mongo
+    restart: always
+    volumes:
+      - local_mongodata:/data/db
+    ports:
+      - "27017:27017"
+
 volumes:
   local_pgdata:
+  local_mongodata:

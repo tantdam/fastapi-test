@@ -6,6 +6,7 @@ app = FastAPI()
 # Init database
 @app.on_event("startup")
 async def startup():
+    '''
     from db import Base, engine
     # from db import db_init
     from models.player import Player
@@ -14,6 +15,11 @@ async def startup():
     from models.user import User
     Base.metadata.create_all(bind=engine)
     # db_init(engine)
+    '''
+
+    from mongo import get_mongo_client
+    app.state.mongo_client = get_mongo_client()
+    app.state.mongo_db = app.state.mongo_client["pokazna"]
 
 
 # Register routes

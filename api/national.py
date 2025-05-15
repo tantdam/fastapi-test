@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from typing import List
+
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 
@@ -8,6 +10,10 @@ from db import get_db
 from models.national import National
 from models.user import User
 from schemas import NationalRead, NationalCreate, NationalUpdate
+import mongo_models
+
+def get_mongo_db(request: Request):
+    return request.app.state.mongo_db
 
 router = APIRouter(prefix="/national", tags=["national"])
 
@@ -40,3 +46,13 @@ def _delete_national(national_id: int, db: Session = Depends(get_db), user: User
     db.delete(db_national)
     db.commit()
     return True
+
+@router.get('/mongo/', response_model=List[mongo_models.national.NationalRead])
+def _read_all_national_mongo(db = Depends(get_mongo_db)):
+    db_national = db.pokazna.find()
+    return db_national
+
+@router.post('/mongo/', response_model=str)
+def _create_national_mongo(national: mongo_models.national.NationalCreate, db = Depends(get_mongo_db)):
+    db_national = db.pokazna.insert_one(national.dict())
+    return str(db_national.inserted_id)
